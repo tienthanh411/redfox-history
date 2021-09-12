@@ -7,6 +7,7 @@ function create_word_dom(index, word) {
     var text_dom = document.createElement('a');
     text_dom.className = 'word-link'
     text_dom.appendChild(text);
+    text_dom.target = '_blank';
     text_dom.href = REDFOX_PREFIX + word;
 
     var index_dom = document.createElement('span');
