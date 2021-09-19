@@ -9,6 +9,13 @@
         a.word-link {
             font-size: 15px;
         }
+        .word-container .meaning-container {
+            display: none;
+        }
+        .word-container:hover .meaning-container {
+            display: block;
+    
+        }
         .word-container {
             padding: 5px;
             margin-left: 15px;
@@ -25,7 +32,8 @@
     <script src="popup.js"></script>
     <div id="content">
         <h1 id="most-recent-title" class="title-container">Most recent</h1>
-        <div id="word-list" style="width: 100%">
+        <button id="clear-all-btn">Clear all</button>
+        <div id="item-list" style="width: 100%">
         </div>
     </div>
 
