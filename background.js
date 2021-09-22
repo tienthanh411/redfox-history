@@ -44,10 +44,11 @@ async function check_and_store_word_info(word) {
         },
     });
     if (response.status != 200) {
+        remove_word(word);
         return;
     }
 
-    const response_json = await response.json(); //extract JSON from the 
+    const response_json = await response.json();
     if (response_json.subtitleResult.query.word2 === undefined) {
         remove_word(word);
     } else {
@@ -77,7 +78,7 @@ function is_valid_word(word) {
 }
 
 chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
-    if (change_info.status != "complete" || !tab.url.startsWith(REDFOX_PREFIX)) {
+    if (change_info.status != 'complete' || !tab.url.startsWith(REDFOX_PREFIX)) {
         return;
     }
 
@@ -86,7 +87,7 @@ chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
         console.log('Invalid word: ' + word);
         return;
     }
-    console.log("Checking: " + word);
+    console.log('Checking: ' + word);
 
     get_stored_item_list(function(item_list){
         var item = null;

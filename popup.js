@@ -10,8 +10,6 @@ function create_item_dom(index, item) {
         info_dom = document.createElement('div');
         info_dom.className = 'word-info-container';
         ul = document.createElement('ul');
-        // var meaning = response_json.subtitleResult.query.word2;
-    // var unique_meaning = [...new Set(meaning)];
         var meanings = [...new Set(item.info.subtitleResult.query.word2)];
         meanings.forEach(function (s) {
             var li = document.createElement('li');
@@ -29,7 +27,7 @@ function create_item_dom(index, item) {
     text_dom.appendChild(document.createTextNode(text));
 
     var index_dom = document.createElement('span');
-    index_dom.textContent = index + ". ";
+    index_dom.textContent = index + '. ';
 
     var ret = document.createElement('div');
     ret.className = 'word-container';
@@ -65,7 +63,7 @@ function remove_all_child_nodes(parent) {
 }
 
 function display_most_recent() {
-    var item_list_dom = document.getElementById("item-list");
+    var item_list_dom = document.getElementById('item-list');
     remove_all_child_nodes(item_list_dom);
 
     get_stored_item_list(function (item_list) {
