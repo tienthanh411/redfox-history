@@ -5,17 +5,20 @@ const MAX_DISPLAYED_WORDS = 30;
 function create_item_dom(index, item) {
     var url = REDFOX_PREFIX + item.word;
     
-    var meaning_dom = null;
-    if (item.meaning.length > 0) {
-        meaning_dom = document.createElement('div');
-        meaning_dom.className = 'meaning-container';
+    var info_dom = null;
+    if (item.info !== undefined) {
+        info_dom = document.createElement('div');
+        info_dom.className = 'word-info-container';
         ul = document.createElement('ul');
-        item.meaning.forEach(function (s) {
+        // var meaning = response_json.subtitleResult.query.word2;
+    // var unique_meaning = [...new Set(meaning)];
+        var meanings = [...new Set(item.info.subtitleResult.query.word2)];
+        meanings.forEach(function (s) {
             var li = document.createElement('li');
             li.textContent = s;
             ul.appendChild(li);
         })
-        meaning_dom.appendChild(ul);
+        info_dom.appendChild(ul);
     }
 
     var text = decodeURI(item.word);
@@ -32,8 +35,8 @@ function create_item_dom(index, item) {
     ret.className = 'word-container';
     ret.appendChild(index_dom);
     ret.appendChild(text_dom);
-    if (meaning_dom) {
-        ret.appendChild(meaning_dom);
+    if (info_dom) {
+        ret.appendChild(info_dom);
     }
     
     return ret;

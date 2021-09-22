@@ -5,7 +5,7 @@ const STORAGE_KEY = 'word_list';
 const TIME_GAP = 60*1000; // 60 seconds
 
 
-function store_word_meaning(word, meaning) {
+function store_word_info(word, info) {
     get_stored_item_list(function (item_list) {
         var item = null;
         for (var i = 0; i < item_list.length; i++) {
@@ -17,12 +17,25 @@ function store_word_meaning(word, meaning) {
         if (item === null) {
             return;
         }
-        item['meaning'] = meaning;
+        item['info'] = info;
         store_item_list(item_list);
     });
 }
 
-async function check_and_store_word_meaning(word) {
+function remove_word(word) {
+    get_stored_item_list(function (item_list) {
+        var item = null;
+        for (var i = 0; i < item_list.length; i++) {
+            if (item_list[i]['word'] == word) {
+                item_list.splice(i, 1);
+                break;
+            }
+        }
+        store_item_list(item_list);
+    });
+}
+
+async function check_and_store_word_info(word) {
     var url = REDFOX_API_PREFIX + word;
     var response = await fetch(url, {
         method: 'GET',
@@ -35,9 +48,11 @@ async function check_and_store_word_meaning(word) {
     }
 
     const response_json = await response.json(); //extract JSON from the 
-    var meaning = response_json.subtitleResult.query.word2;
-    var unique_meaning = [...new Set(meaning)];
-    store_word_meaning(word, unique_meaning);
+    if (response_json.subtitleResult.query.word2 === undefined) {
+        remove_word(word);
+    } else {
+        store_word_info(word, response_json);
+    }
 }
 
 function get_stored_item_list(callback) {
@@ -53,8 +68,12 @@ function get_stored_item_list(callback) {
 function store_item_list(item_list) {
     var set_data = {};
     set_data[STORAGE_KEY] = item_list;
-    console.log(item_list);
     chrome.storage.local.set(set_data, function () { });
+}
+
+function is_valid_word(word) {
+    var decoded_word = decodeURI(word);
+    return !/[^a-zA-ZÄÖäö]/.test(decoded_word);
 }
 
 chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
@@ -63,6 +82,10 @@ chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
     }
 
     const word = tab.url.split('/').pop();
+    if (!is_valid_word(word)) {
+        console.log('Invalid word: ' + word);
+        return;
+    }
     console.log("Checking: " + word);
 
     get_stored_item_list(function(item_list){
@@ -78,7 +101,6 @@ chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
             item['word'] = word;
             item['count'] = 0;
             item['latest'] = 0;
-            item['meaning'] = [];
             item_list.push(item);
         }
         var current_time = Date.now();
@@ -87,7 +109,7 @@ chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {
         }
         item['latest'] = current_time;
         store_item_list(item_list);
-        check_and_store_word_meaning(word);
+        check_and_store_word_info(word);
     });
     
 });
