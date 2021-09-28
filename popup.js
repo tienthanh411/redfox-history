@@ -2,23 +2,41 @@ const REDFOX_PREFIX = "https://redfoxsanakirja.fi/fi/sanakirja/-/s/fin/eng/";
 const STORAGE_KEY = 'word_list';
 const MAX_DISPLAYED_WORDS = 30;
 
-function create_item_dom(index, item) {
-    var url = REDFOX_PREFIX + item.word;
-    
-    var info_dom = null;
-    if (item.info !== undefined) {
-        info_dom = document.createElement('div');
-        info_dom.className = 'word-info-container';
-        ul = document.createElement('ul');
-        var meanings = [...new Set(item.info.subtitleResult.query.word2)];
-        meanings.forEach(function (s) {
-            var li = document.createElement('li');
-            li.textContent = s;
-            ul.appendChild(li);
-        })
-        info_dom.appendChild(ul);
+function create_item_info_dom(item) {
+    if (item.info === undefined) {
+        return null;
     }
+    var info_dom = document.createElement('div');
+    info_dom.className = 'word-info hidden';
+    ul = document.createElement('ul');
+    var meanings = [...new Set(item.info.subtitleResult.query.word2)];
+    meanings.forEach(function (s) {
+        var li = document.createElement('li');
+        li.textContent = s;
+        ul.appendChild(li);
+    })
+    info_dom.appendChild(ul);
+    return info_dom;
+}
 
+function remove_item(item, callback) {
+    get_stored_item_list(function (item_list) {
+        for (var i = 0; i < item_list.length; i++) {
+            if (item_list[i]['word'] == item['word']) {
+                item_list.splice(i, 1);
+                break;
+            }
+        }
+        store_item_list(item_list, callback);
+    });
+}
+
+function create_item_dom(index, item) {
+    // Info DOM contains a list of the word's possible meanings
+    var info_dom = create_item_info_dom(item);
+
+    var url = REDFOX_PREFIX + item.word;
+    // Text DOM contains the word and link to redfox
     var text = decodeURI(item.word);
     var text_dom = document.createElement('a');
     text_dom.className = 'word-link'
@@ -26,13 +44,26 @@ function create_item_dom(index, item) {
     text_dom.href = url;
     text_dom.appendChild(document.createTextNode(text));
 
+    // Word index
     var index_dom = document.createElement('span');
-    index_dom.textContent = index + '. ';
+    index_dom.className = 'word-index'
+    index_dom.textContent = '-';
 
+    // Remove button
+    var remove_btn = document.createElement('button');
+    remove_btn.className = 'item-action-btn hidden'
+    remove_btn.textContent = 'x';
+    remove_btn.addEventListener('click', function (event) {
+        remove_item(item);
+        remove_btn.parentElement.remove();
+    });
+
+    // Container of all
     var ret = document.createElement('div');
     ret.className = 'word-container';
     ret.appendChild(index_dom);
     ret.appendChild(text_dom);
+    ret.appendChild(remove_btn);
     if (info_dom) {
         ret.appendChild(info_dom);
     }
@@ -42,7 +73,7 @@ function create_item_dom(index, item) {
 
 function create_item_panel() {
     var ret = document.createElement('div');
-    ret.className = 'float-child';
+    ret.className = 'item-panel';
     return ret;
 }
 
@@ -53,6 +84,16 @@ function get_stored_item_list(callback) {
             item_list = data[STORAGE_KEY];
         }
         callback(item_list);
+    });
+}
+
+function store_item_list(item_list, callback) {
+    var set_data = {};
+    set_data[STORAGE_KEY] = item_list;
+    chrome.storage.local.set(set_data, function () { 
+        if (callback !== undefined) {
+            callback();
+        }
     });
 }
 

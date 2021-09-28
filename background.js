@@ -74,7 +74,7 @@ function store_item_list(item_list) {
 
 function is_valid_word(word) {
     var decoded_word = decodeURI(word);
-    return !/[^a-zA-ZÄÖäö]/.test(decoded_word);
+    return !/[^a-zA-ZÄÖäö ]/.test(decoded_word);
 }
 
 chrome.tabs.onUpdated.addListener(function (_, change_info, tab) {

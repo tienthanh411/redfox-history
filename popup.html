@@ -3,30 +3,53 @@
   <head>
       <style>
         #content {
-            width: 500px;
+            width: 600px;
             margin: 10px;
         }
-        a.word-link {
+        .word-index {
             font-size: 15px;
+            margin-right: 5px;
         }
         a:visited {
            color: blue;
         }
-        .word-container .word-info-container {
+        a.word-link {
+            font-size: 16px;
+        }
+        .word-container .hidden {
             display: none;
         }
-        .word-container:hover .word-info-container {
+        .word-container:hover .word-info {
+            font-size: 15px;
             display: block;
+        }
+        .word-container:hover .item-action-btn {
+            margin-left: 10px;
+            display: inline-block;
+            color: white; 
+            background: red; 
+            font-size: 11px; 
+            border-color: red; 
+            text-align: center;
+            vertical-align: bottom;
+            padding: 0;             
+            width: 16px;
+            height: 16px;
+            font-weight: bold;
         }
         .word-container {
             padding: 5px;
             margin-left: 15px;
+            width: 100%;
         }
-        .float-child {
+        .item-panel {
             width: 45%;
-            display: inline-block;
             padding: 10px;
             vertical-align: top;
+            display: inline-block;
+        }
+        .bulk-action-btn {
+            font-size: 15px;
         }
       </style>
   </head>
@@ -34,7 +57,7 @@
     <script src="popup.js"></script>
     <div id="content">
         <h1 id="most-recent-title" class="title-container">Most recent</h1>
-        <button id="clear-all-btn">Clear all</button>
+        <button class="bulk-action-btn" id="clear-all-btn">Clear all</button>
         <div id="item-list" style="width: 100%">
         </div>
     </div>
